@@ -4,8 +4,9 @@ import { Observable } from 'rxjs';
 
 import {Transaction} from "../models/transaction.model";
 import {Fund} from "../models/fund.model";
+import {User} from "../models/user.model";
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8082';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class ApiService {
     return this.http.post(`${API_BASE_URL}/users`, user);
   }
 
-  getUsers() {
-    return this.http.get(`${API_BASE_URL}/users`);
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${API_BASE_URL}/users`);
   }
 }
