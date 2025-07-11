@@ -1,0 +1,26 @@
+<h1 class="text-2xl font-bold mb-4">Historial de transacciones</h1>
+
+<div *ngIf="transactions.length === 0" class="text-gray-500">No hay transacciones aún.</div>
+
+<table *ngIf="transactions.length > 0" class="w-full table-auto border">
+  <thead>
+  <tr class="bg-gray-100">
+    <th class="p-2 border">ID</th>
+    <th class="p-2 border">Usuario</th>
+    <th class="p-2 border">Fondo</th>
+    <th class="p-2 border">Monto</th>
+    <th class="p-2 border">Tipo</th>
+    <th class="p-2 border">Fecha</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let tx of transactions" class="text-sm">
+    <td class="border p-1">{{ tx.id }}</td>
+    <td class="border p-1">{{ tx.userId }}</td>
+    <td class="border p-1">{{ tx.fundId }}</td>
+    <td class="border p-1 text-right">{{ tx.amount | currency:'USD' }}</td>
+    <td class="border p-1">{{ tx.type }}</td>
+    <td class="border p-1">{{ tx.date | date:'short' }}</td>
+  </tr>
+  </tbody>
+</table>

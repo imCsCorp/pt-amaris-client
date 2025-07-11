@@ -1,0 +1,36 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4 max-w-md mx-auto p-4 bg-white rounded shadow">
+  <h2 class="text-xl font-bold">Crear Usuario</h2>
+
+  <!-- Nombre -->
+  <div>
+    <label class="block text-sm font-medium">Nombre</label>
+    <input formControlName="name" class="border w-full p-2 rounded" />
+    <p class="text-red-600 text-sm mt-1" *ngIf="name?.invalid && name?.touched">
+      El nombre es obligatorio.
+    </p>
+  </div>
+
+  <!-- Email -->
+  <div>
+    <label class="block text-sm font-medium">Email</label>
+    <input formControlName="email" class="border w-full p-2 rounded" type="email" />
+    <p class="text-red-600 text-sm mt-1" *ngIf="email?.invalid && email?.touched">
+      <span *ngIf="email?.errors?.['required']">El correo es obligatorio.</span>
+      <span *ngIf="email?.errors?.['email']">El correo no es válido.</span>
+    </p>
+  </div>
+
+  <!-- Saldo -->
+  <div>
+    <label class="block text-sm font-medium">Saldo</label>
+    <input formControlName="balance" class="border w-full p-2 rounded" type="number" />
+    <p class="text-red-600 text-sm mt-1" *ngIf="balance?.invalid && balance?.touched">
+      <span *ngIf="balance?.errors?.['required']">El saldo es obligatorio.</span>
+      <span *ngIf="balance?.errors?.['min']">El saldo no puede ser negativo.</span>
+    </p>
+  </div>
+
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" [disabled]="userForm.invalid">
+    Guardar
+  </button>
+</form>
