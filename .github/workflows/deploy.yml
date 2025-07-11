@@ -36,7 +36,7 @@ jobs:
       - name: Crear repositorio ECR público (CloudFormation)
         run: |
           aws cloudformation deploy \
-            --template-file ecr-repo-frontend.yaml \
+            --template-file ecr-repo.yaml \
             --stack-name $STACK_NAME \
             --capabilities CAPABILITY_NAMED_IAM
 
