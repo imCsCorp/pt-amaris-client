@@ -11,7 +11,7 @@ Resources:
   FrontendPublicEcr:
     Type: AWS::ECR::PublicRepository
     Properties:
-      RepositoryName: casv/funds-client
+      RepositoryName: !Ref RepositoryName
 
 Outputs:
   FrontendRepositoryUri:

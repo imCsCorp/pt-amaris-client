@@ -1,4 +1,4 @@
-name: Deploy - funds-api
+name: Deploy - funds-client
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
-      STACK_NAME: funds-api-repo
+      STACK_NAME: funds-client-repo
 
     steps:
       - name: Checkout code
@@ -36,7 +36,7 @@ jobs:
       - name: Crear repositorio ECR público (CloudFormation)
         run: |
           aws cloudformation deploy \
-            --template-file ecr-repo.yaml \
+            --template-file ecr-repo-frontend.yaml \
             --stack-name $STACK_NAME \
             --capabilities CAPABILITY_NAMED_IAM
 
@@ -44,7 +44,7 @@ jobs:
         id: get-repo-uri
         run: |
           URI=$(aws cloudformation describe-stacks \
-            --stack-name funds-client-repo \
+            --stack-name $STACK_NAME \
             --query "Stacks[0].Outputs[?OutputKey=='FrontendRepositoryUri'].OutputValue" \
             --output text)
           echo "REPO_URI=$URI" >> $GITHUB_ENV
@@ -68,6 +68,6 @@ jobs:
         run: |
           aws cloudformation deploy \
             --template-file cloudformation-frontend.yaml \
-            --stack-name funds-api-infra \
+            --stack-name funds-client-infra \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides ImageUri=${{ env.REPO_URI }}:latest
