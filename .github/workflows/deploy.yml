@@ -47,8 +47,12 @@ jobs:
             --stack-name $STACK_NAME \
             --query "Stacks[0].Outputs[?OutputKey=='FrontendRepositoryUri'].OutputValue" \
             --output text)
+          echo "REPO_URI=$URI"
+          if [ -z "$URI" ]; then
+            echo "❌ No se pudo obtener la URI del repositorio."
+            exit 1
+          fi
           echo "REPO_URI=$URI" >> $GITHUB_ENV
-          echo "Repository URI: $URI"
 
       - name: Login to Amazon ECR Public
         uses: aws-actions/amazon-ecr-login@v2
