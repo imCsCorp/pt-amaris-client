@@ -40,12 +40,12 @@ jobs:
             --stack-name $STACK_NAME \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Obtener URI del repositorio público
+      - name: Obtener URI del repositorio público (frontend)
         id: get-repo-uri
         run: |
           URI=$(aws cloudformation describe-stacks \
             --stack-name $STACK_NAME \
-            --query "Stacks[0].Outputs[?OutputKey=='BackendRepositoryUri'].OutputValue" \
+            --query "Stacks[0].Outputs[?OutputKey=='FrontendRepositoryUri'].OutputValue" \
             --output text)
           echo "REPO_URI=$URI" >> $GITHUB_ENV
           echo "Repository URI: $URI"
