@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Infraestructura frontend - Angular en ECS Fargate + Logs
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: URI de la imagen Docker del frontend
+
+Resources:
+  FrontendLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/funds-client
+      RetentionInDays: 7
+
+  FrontendTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  FrontendCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: funds-client-cluster
+
+  FrontendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: funds-client-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [ FARGATE ]
+      ExecutionRoleArn: !GetAtt FrontendTaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: funds-client
+          Image: !Ref ImageUri
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/funds-client
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+
+  FrontendVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.1.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  FrontendSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref FrontendVPC
+      CidrBlock: 10.1.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+
+  FrontendInternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  FrontendAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref FrontendVPC
+      InternetGatewayId: !Ref FrontendInternetGateway
+
+  FrontendRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref FrontendVPC
+
+  FrontendRoute:
+    Type: AWS::EC2::Route
+    DependsOn: FrontendAttachGateway
+    Properties:
+      RouteTableId: !Ref FrontendRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref FrontendInternetGateway
+
+  FrontendSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref FrontendSubnet
+      RouteTableId: !Ref FrontendRouteTable
+
+  FrontendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Acceso HTTP frontend
+      VpcId: !Ref FrontendVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  FrontendService:
+    Type: AWS::ECS::Service
+    DependsOn: FrontendAttachGateway
+    Properties:
+      Cluster: !Ref FrontendCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      TaskDefinition: !Ref FrontendTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: [ !Ref FrontendSecurityGroup ]
+          Subnets: [ !Ref FrontendSubnet ]
+
+Outputs:
+  FrontendService:
+    Description: Servicio ECS del frontend
+    Value: !Ref FrontendService

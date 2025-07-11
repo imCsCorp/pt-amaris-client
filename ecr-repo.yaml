@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Repositorio público ECR para frontend (Angular)
+
+Parameters:
+  RepositoryName:
+    Type: String
+    Default: casv/funds-client
+    Description: Nombre del repositorio ECR público para el frontend
+
+Resources:
+  FrontendPublicEcr:
+    Type: AWS::ECR::PublicRepository
+    Properties:
+      RepositoryName: !Ref RepositoryName
+
+Outputs:
+  FrontendRepositoryUri:
+    Description: URI del repositorio público de frontend
+    Value: !Ref FrontendPublicEcr

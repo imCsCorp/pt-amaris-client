@@ -50,13 +50,13 @@ ng build --configuration production
 ### 🧱 Build local
 
 ```bash
-docker build -t frontend-fondos .
+docker build -t funds-client .
 ```
 
 ### 🚀 Ejecutar localmente
 
 ```bash
-docker run -p 4201:80 frontend-fondos
+docker run -p 4201:80 funds-client
 ```
 
 Accede en: [http://localhost:4201](http://localhost:4201)
