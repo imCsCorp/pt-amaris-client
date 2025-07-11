@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Repositorio público ECR para frontend (Angular)
+Description: Repositorio público ECR para frontend
 
 Parameters:
   RepositoryName:
@@ -11,7 +11,7 @@ Resources:
   FrontendPublicEcr:
     Type: AWS::ECR::PublicRepository
     Properties:
-      RepositoryName: !Ref RepositoryName
+      RepositoryName: casv/funds-client
 
 Outputs:
   FrontendRepositoryUri:

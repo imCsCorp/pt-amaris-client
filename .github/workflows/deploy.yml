@@ -40,11 +40,11 @@ jobs:
             --stack-name $STACK_NAME \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Obtener URI del repositorio público (frontend)
+      - name: Obtener URI del repositorio público
         id: get-repo-uri
         run: |
           URI=$(aws cloudformation describe-stacks \
-            --stack-name $STACK_NAME \
+            --stack-name funds-client-repo \
             --query "Stacks[0].Outputs[?OutputKey=='FrontendRepositoryUri'].OutputValue" \
             --output text)
           echo "REPO_URI=$URI" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ env.REPO_URI }}:latest
 
-      - name: Desplegar infraestructura backend (CloudFormation)
+      - name: Desplegar infraestructura (CloudFormation)
         run: |
           aws cloudformation deploy \
             --template-file cloudformation-frontend.yaml \

@@ -120,8 +120,10 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups: [ !Ref FrontendSecurityGroup ]
           Subnets: [ !Ref FrontendSubnet ]
-
 Outputs:
   FrontendService:
     Description: Servicio ECS del frontend
     Value: !Ref FrontendService
+  FrontendClusterName:
+    Description: Nombre del Cluster ECS
+    Value: !Ref FrontendCluster
