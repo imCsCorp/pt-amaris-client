@@ -7,9 +7,11 @@ Este proyecto es el frontend de la prueba técnica **Fondos**, desarrollado en *
 ## 🚀 Tecnologías
 
 * ✅ Angular 20
+* TypeScript
 * 🎨 TailwindCSS
 * 🐳 Docker + NGINX
-* ☁️ AWS ECR (Public o Private)
+* ☁️ AWS ECR Public
+* CloudFormation
 * ⚙️ GitHub Actions
 
 ---
@@ -53,6 +55,15 @@ ng build --configuration production
 docker build -t funds-client .
 ```
 
+### Etiquetado y push a Amazon ECR Public
+
+```bash
+docker tag funds-client:latest public.ecr.aws/ACCOUNT_ID/casv/funds-client:latest
+docker push public.ecr.aws/ACCOUNT_ID/casv/funds-client:latest
+```
+
+> Reemplaza `ACCOUNT_ID` por el ID de tu cuenta o el nombre generado por CloudFormation.
+
 ### 🚀 Ejecutar localmente
 
 ```bash
@@ -60,39 +71,6 @@ docker run -p 4201:80 funds-client
 ```
 
 Accede en: [http://localhost:4201](http://localhost:4201)
-
----
-
-## 🌐 Dockerfile
-
-```Dockerfile
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY . .
-RUN npm install && npm run build -- --configuration production
-
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/prueba-tecnica-amaris-frontend /usr/share/nginx/html
-```
-
----
-
-## 🌐 `nginx.conf`
-
-```nginx
-server {
-  listen 80;
-  server_name localhost;
-
-  root /usr/share/nginx/html;
-  index index.html;
-
-  location / {
-    try_files $uri $uri/ /index.html;
-  }
-}
-```
 
 ---
 
@@ -117,9 +95,21 @@ Configura en **Settings > Secrets and variables > Actions**:
 | `AWS_ACCESS_KEY_ID`     | Access key de IAM                         |
 | `AWS_SECRET_ACCESS_KEY` | Secret key de IAM                         |
 | `AWS_REGION`            | Ej: `us-east-1`                           |
-| `ECR_REPOSITORY_URI`    | URI de tu repo ECR (`public.ecr.aws/...`) |
 
 ---
+
+## 📦 Despliegue con CloudFormation y GitHub Actions
+
+El despliegue se realiza en dos etapas:
+
+1. Creación del repositorio en Amazon ECR Public (CloudFormation: `ecr-repo.yaml`).
+2. Despliegue de la infraestructura del frontend (`cloudformation-frontend.yaml`) y push de la imagen desde GitHub Actions.
+
+El flujo completo de CI/CD se encuentra en `.github/workflows/deploy.yml`.
+
+## 📄 CloudFormation
+
+- `ecr-repo.yaml`: crea el repositorio público en Amazon ECR para el frontend.
 
 ## ✅ Resultado
 
