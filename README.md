@@ -1,27 +1,139 @@
-# PruebaTecnicaAmarisFrontend
+# 💾 Frontend Fondos - Angular + Tailwind + Docker + GitHub Actions
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.1.
+Este proyecto es el frontend de la prueba técnica **Fondos**, desarrollado en **Angular 20**, estilizado con **TailwindCSS** y empacado con **Docker** para despliegue automático en **AWS ECR**.
 
-## Development server
+---
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 🚀 Tecnologías
 
-## Code scaffolding
+* ✅ Angular 20
+* 🎨 TailwindCSS
+* 🐳 Docker + NGINX
+* ☁️ AWS ECR (Public o Private)
+* ⚙️ GitHub Actions
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+---
 
-## Build
+## 📦 Estructura del proyecto
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```
+frontend-fondos/
+├── src/
+├── dist/
+├── Dockerfile
+├── nginx.conf
+├── angular.json
+└── .github/
+    └── workflows/
+        └── deploy.yml
+```
 
-## Running unit tests
+---
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## ⚙️ Scripts de desarrollo
 
-## Running end-to-end tests
+```bash
+# Instalar dependencias
+npm install
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+# Levantar servidor de desarrollo
+ng serve
 
-## Further help
+# Compilar para producción
+ng build --configuration production
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+---
+
+## 🐳 Docker
+
+### 🧱 Build local
+
+```bash
+docker build -t frontend-fondos .
+```
+
+### 🚀 Ejecutar localmente
+
+```bash
+docker run -p 4201:80 frontend-fondos
+```
+
+Accede en: [http://localhost:4201](http://localhost:4201)
+
+---
+
+## 🌐 Dockerfile
+
+```Dockerfile
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build -- --configuration production
+
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist/prueba-tecnica-amaris-frontend /usr/share/nginx/html
+```
+
+---
+
+## 🌐 `nginx.conf`
+
+```nginx
+server {
+  listen 80;
+  server_name localhost;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
+```
+
+---
+
+## ⚙️ Despliegue automático con GitHub Actions
+
+El flujo `deploy.yml`:
+
+1. Compila Angular.
+2. Crea una imagen Docker.
+3. La sube al repositorio **ECR**.
+
+### 📁 Ubicación
+
+`.github/workflows/deploy.yml`
+
+### 🔐 Secrets requeridos
+
+Configura en **Settings > Secrets and variables > Actions**:
+
+| Nombre                  | Descripción                               |
+| ----------------------- | ----------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | Access key de IAM                         |
+| `AWS_SECRET_ACCESS_KEY` | Secret key de IAM                         |
+| `AWS_REGION`            | Ej: `us-east-1`                           |
+| `ECR_REPOSITORY_URI`    | URI de tu repo ECR (`public.ecr.aws/...`) |
+
+---
+
+## ✅ Resultado
+
+Al hacer push a `main`:
+
+* 🔧 Se compila el proyecto.
+* 🐳 Se construye la imagen Docker.
+* ☁️ Se publica en Amazon ECR.
+
+---
+
+## 🧑 Autor
+
+Camio Alejandro Soto Vega  
+Prueba técnica Angular + Tailwindcss + AWS
+
+---
